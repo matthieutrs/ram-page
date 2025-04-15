@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reconstruct Anything Model</title>
+
+  <!-- Bootstrap CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        crossorigin="anonymous">
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <!-- Custom styles -->
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 2rem;
+    }
+    .jumbotron {
+      text-align: center;
+      background-color: #f8f9fa;
+      padding: 3rem 2rem;
+    }
+    .section {
+      margin-top: 3rem;
+    }
+.juxtapose {
+  max-width: 480px; /* Adjust this as needed */
+  height: auto;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.juxtaposesmall {
+  max-width: 256px; /* Adjust this as needed */
+  height: auto;
+  margin: 0 auto;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+    .highlight {
+      background-color: #ffcdf3; /* pale yellow (Bootstrap's "warning" tint) */
+      font-weight: bold;
+      padding: 0.1em 0.3em;
+      border-radius: 4px;
+    }
+    .thumbnail-gallery img {
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: 0.2s ease;
+      height: 100px;
+      margin: 5px;
+    }
+    .thumbnail-gallery img:hover {
+      border-color: #007bff;
+    }
+    .slider-container {
+      margin-top: 2rem;
+    }
+    .slider-box {
+      display: none;
+    }
+    .slider-box.active {
+      display: block;
+    }
+
+  </style>
+
+  <!-- JuxtaposeJS CSS -->
+  <link rel="stylesheet" href="https://cdn.knightlab.com/libs/juxtapose/latest/css/juxtapose.css">
+</head>
+
+<body>
+
+<div class="jumbotron jumbotron-fluid">
+  <div class="container">
+    <h2>Reconstruct Anything Model</h2>
+    <p class="abstract">A Lightweight Foundational Model for Computational Imaging</p>
+    <hr>
+    <p class="authors">
+      <a href="https://matthieutrs.github.io/">Matthieu Terris<sup>1</sup></a>,
+      <a href="https://samuelhurault.netlify.app/">Samuel Hurault<sup>2</sup></a>,
+      <a href="https://www.linkedin.com/in/maxime-song-ai-engineer/">Maxime Song<sup>3</sup></a>,
+      <a href="https://tachella.github.io/">Julián Tachella<sup>4</sup></a>
+    </p>
+    <p>
+      <a><sup>1</sup>Université Paris-Saclay, Inria, CEA, Palaiseau, France</a><br>
+      <a><sup>2</sup>ENS Paris, PSL, CNRS, Paris, France</a><br>
+      <a><sup>3</sup>CNRS UAR 851, Université Paris-Saclay, Orsay, France</a><br>
+      <a><sup>4</sup>ENS Lyon, CNRS UMR 5672, Lyon, France</a>
+    </p>
+
+    <div class="btn-group mt-3" role="group" aria-label="Top menu">
+      <a class="btn btn-primary" href="https://arxiv.org/abs/2503.08915">Paper (arXiv)</a>
+      <a class="btn btn-primary" href="https://github.com/matthieutrs/ram">Code</a>
+    </div>
+  </div>
+</div>
+
+  <div class="container">
+
+    <div class="section">
+    <h3>Abstract</h3>
+    <p>
+      Most existing learning-based methods for solving imaging inverse problems can be roughly divided into two classes: iterative algorithms, such as plug-and-play and diffusion methods, that leverage pretrained denoisers, and unrolled architectures that are trained end-to-end for specific imaging problems. Iterative methods in the first class are computationally costly and often provide suboptimal reconstruction performance, whereas unrolled architectures are generally specific to a single inverse problem and require expensive training.
+      In this work, we propose a novel non-iterative, lightweight architecture that incorporates knowledge about the forward operator (acquisition physics and noise parameters) without relying on unrolling. Our model is trained to solve a wide range of inverse problems beyond denoising, including deblurring, magnetic resonance imaging, computed tomography, inpainting, and super-resolution.
+      The proposed model can be easily adapted to unseen inverse problems or datasets with a few fine-tuning steps (up to a few images) in a self-supervised way, without ground-truth references. Throughout a series of experiments, we demonstrate state-of-the-art performance from medical imaging to low-photon imaging and microscopy.
+    </p>
+    </div>
+
+    <div class="section">
+    <h3>Architecture Overview</h3>
+    <p>
+      Our architecture builds on DRUNet and is designed to solve general inverse problems with a single model. We introduce a <strong>proximal estimation module</strong> to robustly initialize the inverse solution using a closed-form proximal step tuned to the noise level. A <strong>Krylov Subspace Module (KSM)</strong> conditions on the forward operator by learning combinations of iterated gradients and adjoints, mimicking unrolled solvers without the need for iteration. To address scale sensitivity, we include <strong>multiscale operator conditioning</strong>, which performs physics-aware reasoning on coarse grids to improve stability and reduce computational cost. Our design also incorporates <strong>explicit noise conditioning</strong> for both Gaussian and Poisson-Gaussian noise models, enabling strong generalization across noise levels. Finally, we introduce <strong>modality-adaptive layers</strong> for color, grayscale, and complex data, while keeping the majority of network weights shared across tasks.
+    </p>
+
+    <div class="text-center mt-4">
+      <img src="img/architecture.png" style="max-width: 100%; height: auto;" alt="RAM Architecture Diagram">
+      <p class="mt-2"><strong>Figure:</strong> Overview of our proposed RAM architecture.</p>
+    </div>
+    </div>
+
+    <div class="section">
+  <h3>Training Strategy</h3>
+  <p>
+    We train RAM <strong>simultaneously on multiple computational imaging tasks</strong>, including deblurring, inpainting, Poisson-Gaussian denoising (both grayscale and color), single-coil MRI, and CT reconstruction. These tasks are implemented using the <a href="https://deepinv.github.io/deepinv/">DeepInverse</a> library, which provides a unified framework for inverse problems.
+  </p>
+
+  <p>
+    Each task \( g \) is associated with a dataset \( \mathcal{D}_g = \{ \mathbf{x}_{i,g} \} \). For natural images, we use <a href="https://ofsoundof.github.io/lsdir-data/">LSDIR</a>; for CT, the <a href="https://www.cancerimagingarchive.net/collection/lidc-idri/">LIDC-IDRI</a> dataset; and for MRI, the <a href="https://fastmri.org/">fastMRI</a> brain multicoil subset.
+  </p>
+
+  <p>
+    All tasks are formulated as inverse problems under a Poisson-Gaussian noise model, parameterized by gain \( \gamma \geq 0 \) and Gaussian standard deviation \( \sigma \geq 0 \). For each task \( g \), we minimize a task-specific expected loss:
+  </p>
+
+  <p class="text-center">
+    \[
+    \mathcal{L}_g(\theta, \mathbf{x}_{i,g}) = \mathbb{E}_{(\sigma, \gamma)} \mathbb{E}_{\mathbf{y} | \mathbf{x}} \, \omega_g \left\| \mathcal{R}_\theta(\mathbf{y}, A_g, \sigma, \gamma) - \mathbf{x}_{i,g} \right\|_1
+    \]
+  </p>
+
+  <p>
+    Here, \( \mathcal{R}_\theta \) is the RAM model, \( A_g \) is the forward operator for task \( g \), and the weighting term \( \omega_g = \| A_g^\top \mathbf{y} \| / \sigma \) balances the contribution of each task and noise level. We choose an \( \ell_1 \) loss for better generalization, consistent with prior findings.
+  </p>
+
+  <p>
+    The overall loss is a sum over all tasks:
+  </p>
+
+  <p class="text-center">
+    \[
+    \mathcal{L}(\theta) = \sum_{g=1}^{G} \sum_{i=1}^{N_g} \mathcal{L}_g(\theta, \mathbf{x}_{i,g})
+    \]
+  </p>
+
+  <p>
+    This formulation enables RAM to generalize across imaging modalities and degradation types, while remaining compact and non-iterative.
+  </p>
+</div>
+
+
+
+  <div class="section">
+    <h3>Self-Supervised Fine-Tuning</h3>
+    <p>
+      In many real-world scenarios, the measurement operator \( A \) is not known during training, or ground-truth reference images are unavailable. In these cases, our pretrained RAM model can be adapted using only observed measurement data, leveraging recent advances in <strong>self-supervised learning for inverse problems</strong>.
+    </p>
+
+    <p>
+      Given a set of noisy or incomplete observations \( \{ \mathbf{y}_1, \dots, \mathbf{y}_N \} \), we fine-tune RAM using a self-supervised loss:
+    </p>
+
+    <p class="text-center">
+      \[
+      \mathcal{L}(\theta) = \sum_{i=1}^{N} \mathcal{L}_{\text{MC}}(\theta, \mathbf{y}_i) + \omega \, \mathcal{L}_{\text{NULL}}(\theta, \mathbf{y}_i)
+      \]
+    </p>
+
+    <p>
+      The first term enforces <strong>measurement consistency</strong> \( A \hat{\mathbf{x}} \approx A \mathbf{x} \) while remaining robust to noise. Since no groundtruth \(x\) is available in this case, we leverage Stein's Unbiased Risk Estimator (SURE).
+      For the second term regularizing the <strong>nullspace of the forward model</strong> where no direct information is available, we leverage equivariance arguments Imaging. The trade-off between these terms is controlled by the regularization parameter \( \omega \).
+    </p>
+
+    <p>
+      This self-supervised procedure enables RAM to adapt to new imaging domains without requiring clean targets or retraining from scratch.
+      <br><br>
+      <em>Please refer to our paper for full details.</em>
+    </p>
+  </div>
+
+
+
+<!--    <div class="section">-->
+<!--      <h3>Visual results</h3>-->
+<!--      <p>Slide to compare the low-resolution input vs. high-resolution output from our restoration model.</p>-->
+<!--      <div class="juxtapose" id="slider"></div>-->
+<!--    </div>-->
+
+<div class="section">
+  <h3>Results on training tasks</h3>
+  <p>We show below visual results on tasks seen during training.</p>
+
+  <!-- Thumbnail Gallery -->
+  <div class="thumbnail-gallery d-flex justify-content-center">
+    <img src="img/obs.png" onclick="showSlider(1)" alt="Example 1">
+    <img src="img/obs1.png" onclick="showSlider(2)" alt="Example 2">
+    <img src="img/obs2.png" onclick="showSlider(3)" alt="Example 3">
+    <img src="img/obs3.png" onclick="showSlider(4)" alt="Example 4">
+    <img src="img/obs4.png" onclick="showSlider(5)" alt="Example 5">
+    <img src="img/obs5.png" onclick="showSlider(6)" alt="Example 6">
+  </div>
+
+  <!-- Sliders -->
+<div class="slider-container">
+
+  <div id="slider1" class="slider-box active">
+    <h5 class="text-center">Motion deblurring</h5>
+    <div class="juxtapose" id="juxtapose1"></div>
+  </div>
+
+  <div id="slider2" class="slider-box">
+    <h5 class="text-center">Poisson denoising</h5>
+    <div class="juxtapose" id="juxtapose2"></div>
+  </div>
+
+  <div id="slider3" class="slider-box">
+    <h5 class="text-center">Magnetic Resonance Imaging, factor 8, noisy</h5>
+    <div class="juxtapose" id="juxtapose3"></div>
+  </div>
+
+  <div id="slider4" class="slider-box">
+    <h5 class="text-center">Motion deblurring</h5>
+    <div class="juxtapose" id="juxtapose4"></div>
+  </div>
+
+  <div id="slider5" class="slider-box">
+    <h5 class="text-center">Super resolution</h5>
+    <div class="juxtapose" id="juxtapose5"></div>
+  </div>
+
+  <div id="slider6" class="slider-box">
+    <h5 class="text-center">Inpainting</h5>
+    <div class="juxtapose" id="juxtapose6"></div>
+  </div>
+
+</div>
+
+  <div class="section">
+  <h3>Visual Results on out-of-distribution tasks</h3>
+  <p>RAM can be applied to problems other than those from the training set.</p>
+
+  <!-- Thumbnail Gallery -->
+  <div class="thumbnail-gallery d-flex justify-content-center">
+    <img src="img/obs7.png" onclick="showSlider(7)" alt="Example 7">
+    <img src="img/obs8.png" onclick="showSlider(8)" alt="Example 8">
+    <img src="img/obs9.png" onclick="showSlider(9)" alt="Example 9">
+  </div>
+
+  <!-- Sliders -->
+<div class="slider-container">
+
+  <div id="slider7" class="slider-box active">
+    <h5 class="text-center">Computed tomography with Poisson noise</h5>
+    <div class="juxtapose" id="juxtapose7"></div>
+  </div>
+
+  <div id="slider8" class="slider-box">
+    <h5 class="text-center">Random Inpainting</h5>
+    <div class="juxtapose" id="juxtapose8"></div>
+  </div>
+
+  <div id="slider9" class="slider-box">
+    <h5 class="text-center">Multi-coil Magnetic Resonance Imaging, factor 8, noisy</h5>
+    <div class="juxtapose" id="juxtapose9"></div>
+  </div>
+
+    <div class="section">
+  <h3>Self-supervised finetuning</h3>
+  <p>Using the self-supervised approach described above, RAM can be finetuned in few gradients steps on real imaging problems without supervision. Results shown below were finetuned on a single image.</p>
+
+  <!-- Thumbnail Gallery -->
+  <div class="thumbnail-gallery d-flex justify-content-center">
+    <img src="img/obs10.png" onclick="showSlider(10)" alt="Example 10">
+    <img src="img/obs11.png" onclick="showSlider(11)" alt="Example 11">
+    <img src="img/obs12.png" onclick="showSlider(12)" alt="Example 12">
+    <img src="img/obs13.png" onclick="showSlider(13)" alt="Example 13">
+  </div>
+
+  <!-- Sliders -->
+<div class="slider-container">
+
+  <div id="slider10" class="slider-box active mb-4">
+    <h5 class="text-center">Image demosaicing</h5>
+    <div class="juxtaposesmall" id="juxtapose10"></div>
+  </div>
+
+  <div id="slider11" class="slider-box mb-4">
+    <h5 class="text-center">Compressed sensing</h5>
+    <div class="juxtaposesmall" id="juxtapose11"></div>
+  </div>
+
+  <div id="slider12" class="slider-box mb-4">
+    <h5 class="text-center">Low photon imaging (SPAD)</h5>
+    <div class="juxtaposesmall" id="juxtapose12"></div>
+  </div>
+
+    <div id="slider13" class="slider-box mb-4">
+    <h5 class="text-center">Cryo electron microscopy</h5>
+    <div class="juxtaposesmall" id="juxtapose13"></div>
+  </div>
+
+</div>
+
+<p>The RAM model is lightweight and ready to use across tasks — from denoising to MRI. Check out the code and demo, and feel free to use it for your own research!</p>
+
+    <div class="section">
+      <h3>BibTeX</h3>
+      <pre>
+@article{terris2025reconstruct,
+  title={Reconstruct Anything Model: a lightweight foundation model for computational imaging},
+  author={Terris, Matthieu and Hurault, Samuel and Song, Maxime and Tachella, Julian},
+  journal={arXiv preprint arXiv:2503.08915},
+  year={2025}
+}
+
+      </pre>
+    </div>
+
+    <footer class="text-center mt-5">
+      <p>Template adapted from <a href="https://wustl-cig.github.io/randomwalk/">Random Walks with Tweedie</a></p>
+    </footer>
+  </div>
+
+  <!-- JuxtaposeJS -->
+  <script src="https://cdn.knightlab.com/libs/juxtapose/latest/js/juxtapose.min.js"></script>
+  <script>
+    new juxtapose.JXSlider('#slider', [
+      {
+        src: 'img/obs.png',
+        label: 'Low-Res'
+      },
+      {
+        src: 'img/ram.png',
+        label: 'Restored'
+      }
+    ], {
+      animate: true,
+      showLabels: true,
+      showCredits: false,
+      startingPosition: "50%"
+    });
+  </script>
+
+<script>
+  const initialized = [false, false, false, false, false, false, false, false, false, false, false, false, false];  // one flag per slider
+
+  function showSlider(n) {
+    // Hide all slider containers
+    document.querySelectorAll('.slider-box').forEach((el, i) => {
+      el.classList.remove('active');
+    });
+
+    // Show the selected one
+    const selected = document.getElementById('slider' + n);
+    selected.classList.add('active');
+
+    // Lazy initialize the juxtapose slider
+    if (!initialized[n - 1]) {
+      const containerId = '#juxtapose' + n;
+
+      // Define your images for each slider here
+      const sliders = {
+        1: [
+          { src: 'img/obs.png', label: 'Low-Res' },
+          { src: 'img/ram.png', label: 'Restored' }
+        ],
+        2: [
+          { src: 'img/obs1.png', label: 'Low-Res' },
+          { src: 'img/ram1.png', label: 'Restored' }
+        ],
+        3: [
+          { src: 'img/ram2.png', label: 'Low-Res' },
+          { src: 'img/obs2.png', label: 'Restored' }
+        ],
+        4: [
+          { src: 'img/obs3.png', label: 'Low-Res' },
+          { src: 'img/ram3.png', label: 'Restored' }
+        ],
+        5: [
+          { src: 'img/obs4.png', label: 'Low-Res' },
+          { src: 'img/ram4.png', label: 'Restored' }
+        ],
+        6: [
+          { src: 'img/obs5.png', label: 'Low-Res' },
+          { src: 'img/ram5.png', label: 'Restored' }
+        ],
+        7: [
+          { src: 'img/obs7.png', label: 'Low-Res' },
+          { src: 'img/ram7.png', label: 'Restored' }
+        ],
+        8: [
+          { src: 'img/obs8.png', label: 'Low-Res' },
+          { src: 'img/ram8.png', label: 'Restored' }
+        ],
+        9: [
+          { src: 'img/obs9.png', label: 'Low-Res' },
+          { src: 'img/ram9.png', label: 'Restored' }
+        ],
+        10: [
+          { src: 'img/obs10.png', label: 'Low-Res' },
+          { src: 'img/ram10.png', label: 'Restored' }
+        ],
+        11: [
+          { src: 'img/obs11.png', label: 'Low-Res' },
+          { src: 'img/ram11.png', label: 'Restored' }
+        ],
+        12: [
+          { src: 'img/obs12.png', label: 'Low-Res' },
+          { src: 'img/ram12.png', label: 'Restored' }
+        ],
+        13: [
+          { src: 'img/obs13.png', label: 'Low-Res' },
+          { src: 'img/ram13.png', label: 'Restored' }
+        ]
+      };
+
+      new juxtapose.JXSlider(containerId, sliders[n], {
+        animate: true,
+        showLabels: true,
+        showCredits: false,
+        startingPosition: "50%"
+      });
+
+      initialized[n - 1] = true;
+    }
+  }
+
+  // Optional: Initialize the first one by default on page load
+  window.onload = () => showSlider(1);
+</script>
+
+
+  <!-- Optional Bootstrap JS -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</body>
+</html>
