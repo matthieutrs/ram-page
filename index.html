@@ -94,6 +94,7 @@
     <div class="btn-group mt-3" role="group" aria-label="Top menu">
       <a class="btn btn-primary" href="https://arxiv.org/abs/2503.08915">Paper (arXiv)</a>
       <a class="btn btn-primary" href="https://github.com/matthieutrs/ram">Code</a>
+      <a class="btn btn-primary" href="https://huggingface.co/spaces/deepinv/denoising">HF demo</a>
     </div>
   </div>
 </div>
@@ -190,130 +191,112 @@
     </p>
   </div>
 
-
-
-<!--    <div class="section">-->
-<!--      <h3>Visual results</h3>-->
-<!--      <p>Slide to compare the low-resolution input vs. high-resolution output from our restoration model.</p>-->
-<!--      <div class="juxtapose" id="slider"></div>-->
-<!--    </div>-->
-
+  <!-- Training Results -->
 <div class="section">
   <h3>Results on training tasks</h3>
   <p>We show below visual results on tasks seen during training.</p>
-
-  <!-- Thumbnail Gallery -->
+  <p class="text-center"><em>Click on a thumbnail to view the comparison.</em></p>
   <div class="thumbnail-gallery d-flex justify-content-center">
-    <img src="img/obs.png" onclick="showSlider(1)" alt="Example 1">
-    <img src="img/obs1.png" onclick="showSlider(2)" alt="Example 2">
-    <img src="img/obs2.png" onclick="showSlider(3)" alt="Example 3">
-    <img src="img/obs3.png" onclick="showSlider(4)" alt="Example 4">
-    <img src="img/obs4.png" onclick="showSlider(5)" alt="Example 5">
-    <img src="img/obs5.png" onclick="showSlider(6)" alt="Example 6">
+    <img src="img/obs0.png" onclick="showSlider('train', 0)" alt="Example 0">
+    <img src="img/obs1.png" onclick="showSlider('train', 1)" alt="Example 1">
+    <img src="img/obs2.png" onclick="showSlider('train', 2)" alt="Example 2">
+    <img src="img/obs3.png" onclick="showSlider('train', 3)" alt="Example 3">
+    <img src="img/obs4.png" onclick="showSlider('train', 4)" alt="Example 4">
+    <img src="img/obs5.png" onclick="showSlider('train', 5)" alt="Example 5">
+    <img src="img/obs6.png" onclick="showSlider('train', 6)" alt="Example 6">
   </div>
 
-  <!-- Sliders -->
-<div class="slider-container">
-
-  <div id="slider1" class="slider-box active">
-    <h5 class="text-center">Motion deblurring</h5>
-    <div class="juxtapose" id="juxtapose1"></div>
+  <div class="slider-container" id="train-sliders">
+    <div id="train-slider0" class="slider-box active">
+      <h5 class="text-center">Motion deblurring</h5>
+      <div class="juxtapose" id="train-juxtapose0"></div>
+    </div>
+    <div id="train-slider1" class="slider-box active">
+      <h5 class="text-center">Poisson denoising</h5>
+      <div class="juxtapose" id="train-juxtapose1"></div>
+    </div>
+    <div id="train-slider2" class="slider-box">
+      <h5 class="text-center">MRI, acceleration factor 8</h5>
+      <div class="juxtapose" id="train-juxtapose2"></div>
+    </div>
+    <div id="train-slider3" class="slider-box">
+      <h5 class="text-center">Motion deblurring</h5>
+      <div class="juxtapose" id="train-juxtapose3"></div>
+    </div>
+    <div id="train-slider4" class="slider-box">
+      <h5 class="text-center">Super resolution x4</h5>
+      <div class="juxtapose" id="train-juxtapose4"></div>
+    </div>
+    <div id="train-slider5" class="slider-box">
+      <h5 class="text-center">Motion deblurring</h5>
+      <div class="juxtapose" id="train-juxtapose5"></div>
+    </div>
+    <div id="train-slider6" class="slider-box">
+      <h5 class="text-center">Random inpainting</h5>
+      <div class="juxtapose" id="train-juxtapose6"></div>
+    </div>
   </div>
-
-  <div id="slider2" class="slider-box">
-    <h5 class="text-center">Poisson denoising</h5>
-    <div class="juxtapose" id="juxtapose2"></div>
-  </div>
-
-  <div id="slider3" class="slider-box">
-    <h5 class="text-center">Magnetic Resonance Imaging, factor 8, noisy</h5>
-    <div class="juxtapose" id="juxtapose3"></div>
-  </div>
-
-  <div id="slider4" class="slider-box">
-    <h5 class="text-center">Motion deblurring</h5>
-    <div class="juxtapose" id="juxtapose4"></div>
-  </div>
-
-  <div id="slider5" class="slider-box">
-    <h5 class="text-center">Super resolution</h5>
-    <div class="juxtapose" id="juxtapose5"></div>
-  </div>
-
-  <div id="slider6" class="slider-box">
-    <h5 class="text-center">Inpainting</h5>
-    <div class="juxtapose" id="juxtapose6"></div>
-  </div>
-
 </div>
+
 
   <div class="section">
   <h3>Visual Results on out-of-distribution tasks</h3>
   <p>RAM can be applied to problems other than those from the training set.</p>
+  <p class="text-center"><em>Click on a thumbnail to view the interactive comparison.</em></p>
 
-  <!-- Thumbnail Gallery -->
   <div class="thumbnail-gallery d-flex justify-content-center">
-    <img src="img/obs7.png" onclick="showSlider(7)" alt="Example 7">
-    <img src="img/obs8.png" onclick="showSlider(8)" alt="Example 8">
-    <img src="img/obs9.png" onclick="showSlider(9)" alt="Example 9">
+    <img src="img/obs7.png" onclick="showSlider('ood', 7)" alt="Example 7">
+    <img src="img/obs8.png" onclick="showSlider('ood', 8)" alt="Example 8">
+    <img src="img/obs9.png" onclick="showSlider('ood', 9)" alt="Example 9">
   </div>
 
-  <!-- Sliders -->
-<div class="slider-container">
-
-  <div id="slider7" class="slider-box active">
-    <h5 class="text-center">Computed tomography with Poisson noise</h5>
-    <div class="juxtapose" id="juxtapose7"></div>
+  <div class="slider-container" id="ood-sliders">
+    <div id="ood-slider7" class="slider-box active">
+      <h5 class="text-center">CT with Poisson N</h5>
+      <div class="juxtapose" id="ood-juxtapose7"></div>
+    </div>
+    <div id="ood-slider8" class="slider-box active">
+      <h5 class="text-center">Random Inpainting</h5>
+      <div class="juxtapose" id="ood-juxtapose8"></div>
+    </div>
+    <div id="ood-slider9" class="slider-box">
+      <h5 class="text-center">Multi-coil MRI</h5>
+      <div class="juxtapose" id="ood-juxtapose9"></div>
+    </div>
   </div>
+</div>
 
-  <div id="slider8" class="slider-box">
-    <h5 class="text-center">Random Inpainting</h5>
-    <div class="juxtapose" id="juxtapose8"></div>
-  </div>
 
-  <div id="slider9" class="slider-box">
-    <h5 class="text-center">Multi-coil Magnetic Resonance Imaging, factor 8, noisy</h5>
-    <div class="juxtapose" id="juxtapose9"></div>
-  </div>
-
-    <div class="section">
+<div class="section">
   <h3>Self-supervised finetuning</h3>
   <p>Using the self-supervised approach described above, RAM can be finetuned in few gradients steps on real imaging problems without supervision. Results shown below were finetuned on a single image.</p>
+  <p class="text-center"><em>Click on a thumbnail to view the interactive comparison.</em></p>
 
-  <!-- Thumbnail Gallery -->
+
   <div class="thumbnail-gallery d-flex justify-content-center">
-    <img src="img/obs10.png" onclick="showSlider(10)" alt="Example 10">
-    <img src="img/obs11.png" onclick="showSlider(11)" alt="Example 11">
-    <img src="img/obs12.png" onclick="showSlider(12)" alt="Example 12">
-    <img src="img/obs13.png" onclick="showSlider(13)" alt="Example 13">
+    <img src="img/obs10.png" onclick="showSlider('self', 10)" alt="Example 7">
+    <img src="img/obs11.png" onclick="showSlider('self', 11)" alt="Example 8">
+    <img src="img/obs12.png" onclick="showSlider('self', 12)" alt="Example 9">
   </div>
 
-  <!-- Sliders -->
-<div class="slider-container">
-
-  <div id="slider10" class="slider-box active mb-4">
-    <h5 class="text-center">Image demosaicing</h5>
-    <div class="juxtaposesmall" id="juxtapose10"></div>
-  </div>
-
-  <div id="slider11" class="slider-box mb-4">
-    <h5 class="text-center">Compressed sensing</h5>
-    <div class="juxtaposesmall" id="juxtapose11"></div>
-  </div>
-
-  <div id="slider12" class="slider-box mb-4">
-    <h5 class="text-center">Low photon imaging (SPAD)</h5>
-    <div class="juxtaposesmall" id="juxtapose12"></div>
-  </div>
-
-    <div id="slider13" class="slider-box mb-4">
-    <h5 class="text-center">Cryo electron microscopy</h5>
-    <div class="juxtaposesmall" id="juxtapose13"></div>
+  <div class="slider-container" id="self-sliders">
+    <div id="self-slider10" class="slider-box active mb-4">
+      <h5 class="text-center">Demosaicing</h5>
+      <div class="juxtaposesmall" id="self-juxtapose10"></div>
+    </div>
+    <div id="self-slider11" class="slider-box active mb-4">
+      <h5 class="text-center">Compressed Sensing</h5>
+      <div class="juxtaposesmall" id="self-juxtapose11"></div>
+    </div>
+    <div id="self-slider12" class="slider-box mb-4">
+      <h5 class="text-center">Low Photon (SPAD) imaging</h5>
+      <div class="juxtaposesmall" id="self-juxtapose12"></div>
+    </div>
   </div>
 
 </div>
 
-<p>The RAM model is lightweight and ready to use across tasks — from denoising to MRI. Check out the code and demo, and feel free to use it for your own research!</p>
+<p>The RAM model is lightweight and ready to use across tasks — from denoising to MRI. Check out the <a href="https://github.com/matthieutrs/ram" target="_blank">code</a>, <a href="https://huggingface.co/spaces/deepinv/denoising" target="_blank">interactive demo</a>, and <a href="https://arxiv.org/abs/2503.08915" target="_blank">paper</a>!</p>
 
     <div class="section">
       <h3>BibTeX</h3>
@@ -338,11 +321,11 @@
   <script>
     new juxtapose.JXSlider('#slider', [
       {
-        src: 'img/obs.png',
+        src: 'img/obs0.png',
         label: 'Low-Res'
       },
       {
-        src: 'img/ram.png',
+        src: 'img/ram0.png',
         label: 'Restored'
       }
     ], {
@@ -353,94 +336,42 @@
     });
   </script>
 
-<script>
-  const initialized = [false, false, false, false, false, false, false, false, false, false, false, false, false];  // one flag per slider
+  <script>
+  const initialized = {};
 
-  function showSlider(n) {
-    // Hide all slider containers
-    document.querySelectorAll('.slider-box').forEach((el, i) => {
+  function showSlider(section, n) {
+    // Hide all sliders in this section
+    document.querySelectorAll(`#${section}-sliders .slider-box`).forEach((el, i) => {
       el.classList.remove('active');
     });
 
-    // Show the selected one
-    const selected = document.getElementById('slider' + n);
-    selected.classList.add('active');
+    // Show selected slider
+    const targetId = `${section}-slider${n}`;
+    document.getElementById(targetId).classList.add('active');
 
-    // Lazy initialize the juxtapose slider
-    if (!initialized[n - 1]) {
-      const containerId = '#juxtapose' + n;
-
-      // Define your images for each slider here
-      const sliders = {
-        1: [
-          { src: 'img/obs.png', label: 'Low-Res' },
-          { src: 'img/ram.png', label: 'Restored' }
-        ],
-        2: [
-          { src: 'img/obs1.png', label: 'Low-Res' },
-          { src: 'img/ram1.png', label: 'Restored' }
-        ],
-        3: [
-          { src: 'img/ram2.png', label: 'Low-Res' },
-          { src: 'img/obs2.png', label: 'Restored' }
-        ],
-        4: [
-          { src: 'img/obs3.png', label: 'Low-Res' },
-          { src: 'img/ram3.png', label: 'Restored' }
-        ],
-        5: [
-          { src: 'img/obs4.png', label: 'Low-Res' },
-          { src: 'img/ram4.png', label: 'Restored' }
-        ],
-        6: [
-          { src: 'img/obs5.png', label: 'Low-Res' },
-          { src: 'img/ram5.png', label: 'Restored' }
-        ],
-        7: [
-          { src: 'img/obs7.png', label: 'Low-Res' },
-          { src: 'img/ram7.png', label: 'Restored' }
-        ],
-        8: [
-          { src: 'img/obs8.png', label: 'Low-Res' },
-          { src: 'img/ram8.png', label: 'Restored' }
-        ],
-        9: [
-          { src: 'img/obs9.png', label: 'Low-Res' },
-          { src: 'img/ram9.png', label: 'Restored' }
-        ],
-        10: [
-          { src: 'img/obs10.png', label: 'Low-Res' },
-          { src: 'img/ram10.png', label: 'Restored' }
-        ],
-        11: [
-          { src: 'img/obs11.png', label: 'Low-Res' },
-          { src: 'img/ram11.png', label: 'Restored' }
-        ],
-        12: [
-          { src: 'img/obs12.png', label: 'Low-Res' },
-          { src: 'img/ram12.png', label: 'Restored' }
-        ],
-        13: [
-          { src: 'img/obs13.png', label: 'Low-Res' },
-          { src: 'img/ram13.png', label: 'Restored' }
-        ]
-      };
-
-      new juxtapose.JXSlider(containerId, sliders[n], {
+    // Lazy init
+    const key = `${section}-${n}`;
+    if (!initialized[key]) {
+      new juxtapose.JXSlider(`#${section}-juxtapose${n}`, [
+        { src: `img/obs${n}.png`, label: 'Degraded' },
+        { src: `img/ram${n}.png`, label: 'Restored' }
+      ], {
         animate: true,
         showLabels: true,
         showCredits: false,
         startingPosition: "50%"
       });
-
-      initialized[n - 1] = true;
+      initialized[key] = true;
     }
   }
 
-  // Optional: Initialize the first one by default on page load
-  window.onload = () => showSlider(1);
+  // Initialize the first slider in each section by default
+  window.onload = () => {
+    showSlider('train', 1);
+    showSlider('ood', 7);
+    showSlider('self', 10);
+  };
 </script>
-
 
   <!-- Optional Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
